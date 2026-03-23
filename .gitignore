@@ -1,0 +1,44 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.Python
+*.egg-info/
+.eggs/
+
+# ROS 2 / colcon
+build/
+install/
+log/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# Env & secrets
+.env
+.env.*
+!.env.example
+
+# Logs & runtime
+*.log
+mission_logs/
+
+# LaTeX / build artifacts (if you add thesis under docs/)
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.out
+*.synctex.gz
+*.toc
+
+# Next / Vite / build outputs
+dist/
+.next/
+*.local
