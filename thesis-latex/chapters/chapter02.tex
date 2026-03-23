@@ -1,0 +1,107 @@
+% Chapter 2: Literature Review (full)
+
+\chapter{Literature Review}
+\label{ch:lit}
+
+The following review draws on foundational and recent work in exploration, SLAM, communication, and perception. Robotic search in collapsed, GNSS-denied indoor environments faces three core hurdles: reliable communication, localisation/autonomy, and real-time data delivery. While recent surveys show progress in perception and coordination, gaps remain in autonomy and interference \cite{queralta2020}. To avoid hazardous manual entry cycles, robots must balance autonomous exploration with consistent telemetry \cite{lu2022}. The sections below review existing technologies and their relevance to this study.
+
+\section{Mapping and Localization}
+\label{sec:lit_mapping}
+
+LiDAR odometry is the most reliable mapping method indoors, as it is unaffected by lighting, smoke, or low-texture environments \cite{lee2024}. However, accuracy can diminish in repetitive corridors or sparse geometry without corrective algorithms. Consequently, it is standard to combine LiDAR with IMUs or visual odometry (VO), alongside scan-matching and loop closure, to reduce drift and maintain map consistency. These processes are computationally expensive for embedded systems with limited headroom. This trade-off between hardware and accuracy is central to developing realistic SLAM for disaster response. The goal is a cost-effective architecture balancing real-time SLAM, sensor fusion, localisation, and operator communication. Recent SLAM methods are compared in Table~\ref{tab:slam_compare}.
+
+\begin{table}[htbp]
+\caption{Comparison of scan-matching versus sensor fusion approaches for 2D SLAM in mobile robotics.}
+\label{tab:slam_compare}
+\centering
+\small
+\begin{tabular}{p{2.8cm}p{3.2cm}p{3.8cm}}
+\toprule
+\textbf{Aspect} & \textbf{ICP-Based 2D LiDAR \cite{silva2025}} & \textbf{Multi-Platform LIO/LO methods \cite{lee2024}} \\
+\midrule
+Sensor stack & Single 2D LiDAR with MPU6050 IMU (no wheel odometry), ICP-based scan-to-scan & LiDAR only / LiDAR-IMU / multi-LiDAR or optionally camera fusion \\
+Core methodology & GN-ICP point-to-plane & LIO-SAM, FAST-LIO2, Point-LIO \\
+Real-time & 3\,s delay due to ICP convergence on mini PC & High-rate odometry for aggressive motion \\
+Loop closure & None & Present in many SLAM stacks \\
+Key issue & ICP convergence time; localisation drifts over time & Needs accurate time-synced odometry and IMU data \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Combining aerial and ground robots is now standard in Search and Rescue (SAR) to maximise coverage and mobility, as seen in the DARPA Subterranean Challenge \cite{lu2022}. A case study of the NCTU team's heterogeneous system highlights key trade-offs: their autonomous blimp showed extreme stamina, using only 15.81\,W compared to a quadcopter's 971.9\,W. However, the blimp struggled in narrow tunnels ($<$2.5\,m) and moderate airflow, where drag overwhelmed propulsion. Its limited 86° field of view also led to frequent entrapments. Integrating data and maintaining SLAM consistency across such fleets is difficult. In the NCTU case, ground vehicles used Velodyne LiDAR with LeGo-LOAM, while the blimp used visual odometry; merging these disparate maps proved challenging. Power also remains a bottleneck. Consequently, for budget-constrained missions, a single optimised UGV can be more reliable than a complex heterogeneous fleet \cite{lu2022}.
+
+Technically, ICP-based approaches are sensor-light but suffer from slow convergence and drift in featureless areas. Modern LiDAR-IMU Odometry (LIO) handles aggressive motion better but requires precise time-synchronisation and high-end computing. Many lightweight stacks also lack loop closure, leading to distorted maps during long missions. Indoor SAR presents unique hurdles like stairways, collapsed corridors, and smoke. While frontier-based exploration helps map unknown spaces, multi-storey navigation and localisation drift remain significant issues. Furthermore, most ICP systems assume static environments, but SAR sites contain dynamic obstacles that can degrade scan consistency. Without real-time filtering and robust sensor fusion (LiDAR, IMU, and wheel odometry), maps can deteriorate rapidly. In conclusion, a bottleneck persists due to the lack of embedded-ready, integrated SLAM stacks. Practical solutions must optimise for limited hardware while ensuring resilience in dynamic environments and consistent loop closure.
+
+\section{Communication and Networking}
+\label{sec:lit_comms}
+
+Indoor wireless networking faces severe constraints in SAR due to walls and debris causing attenuation, fading, and congestion \cite{matracia2022}. Consequently, exploration systems must be self-forming and self-healing. A hybrid approach is preferred: high-rate channels (Wi-Fi/5G) for video and maps, paired with a reliable low-rate link for telemetry and control. Since indoor geometry often blocks line-of-sight for aerial relays, grounded robots and static nodes are prioritised to maintain data paths to command posts. Table~\ref{tab:comms_compare} compares wireless communication approaches for disaster site robot networks.
+
+\begin{table}[htbp]
+\caption{Comparison of wireless communication approaches for disaster site robot networks.}
+\label{tab:comms_compare}
+\centering
+\small
+\begin{tabular}{p{1.8cm}p{1.6cm}p{2.2cm}p{2.2cm}p{2cm}}
+\toprule
+\textbf{Work} & \textbf{Goal} & \textbf{Strengths} & \textbf{Issues} & \textbf{Key metrics} \\
+\midrule
+SDR UAV \cite{rukaiya2024} & Hybrid UAV connectivity & Virtual sub-networks, parallel links & Assumes LoS; indoor multipath severe & 2.6\,Mb/s; latency 340--820\,ms \\
+6G/SAGIN \cite{matracia2022} & Survey recovery comms & DTN, SDN, UAV placement, backhaul & No implementations; few indoor models & Coverage/capacity; handover \\
+LoRa indoor/outdoor \cite{saban2021} & LoRa RSSI/SNR/PDR & Empirical attenuation; gateway elevation & Low throughput; high latency; no mesh & PDR $<$40\% at 2 walls; 0.25--5.4\,kbps \\
+Mobile relay \cite{hurst2023} & Robotic relay optimisation & Joint stop positions + routing; handles non-convex & Single relay; simulation-only & $\sim$35\% lower wait vs TSP; $\sim$50\,m/link \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+LoRa is often unsuitable for multi-robot coordination in debris-filled buildings, as packet delivery rates can drop below 40\% after only a few structures \cite{saban2021}. Instead, 2.4\,GHz mesh architectures are preferred for their ability to adaptively route through relays. Modern SAR robots increasingly use communication-aware navigation, treating link quality (RSSI and SNR) as a core operational input. Mobile relays can improve wait times when stop locations are optimised for signal strength \cite{hurst2023}. The NCTU team addressed indoor constraints using a three-tier mesh architecture \cite{lu2022}: XBee (ZigBee) for low-bandwidth control and telemetry (indoor range 25--75\,m for $\sim$85\% PDR, with 90° corners causing 15--20\,dB losses); UWB for ranging (7--13\,m reliable, single turns 15--33\,dB losses); WiFi mesh for map sync and video (1--4 FPS), with PDR highly volatile (20--80\%) based on antenna or geometry. These findings highlight that autonomous SAR agents cannot rely on static network planning and instead require navigation models that dynamically balance exploration goals with signal thresholds for node dispersal \cite{lu2022}.
+
+\section{Human-Robot Collaboration}
+\label{sec:lit_hri}
+
+SAR research focuses on three themes: computational efficiency for hardware-constrained mapping, resilient communication to handle network disruptions, and intuitive human-robot interaction to reduce responder cognitive load. Despite progress in system frameworks and path-blocking strategies, current solutions remain fragmented. Most work is either high-level conceptual framing or highly specialised studies on specific navigation or aerial supervision pipelines. Consequently, there is a lack of practical, integrated ground-robot systems that combine mapping, networking, and collaboration into a single deployable platform \cite{queralta2020}. Table~\ref{tab:hri_compare} compares existing HRI methods in SAR, including clearance-aware path planning \cite{lee2023} and multi-robot operator supervision \cite{chan2023}.
+
+\begin{table}[htbp]
+\caption{Comparison of existing HRI methods in SAR.}
+\label{tab:hri_compare}
+\centering
+\small
+\begin{tabular}{p{2.2cm}p{2.2cm}p{2.2cm}p{1.8cm}p{2.2cm}}
+\toprule
+\textbf{Domain} & \textbf{Approach} & \textbf{Results} & \textbf{Key metrics} & \textbf{Limitations} \\
+\midrule
+Multi-robot SAR \cite{queralta2020} & Conceptual architectures (planning, coordination, perception) & Autonomy, communication, coordination challenges & Mostly conceptual & Heavy focus on swarms; lacks embedded feasibility \\
+Indoor path planning \cite{lee2023} & Clearance-aware multi-level route optimisation & Efficient path computation & Faster pathfinding in simulation & Focused on human rescuers; no comm or AI \\
+HRI \cite{chan2023} & Operator supervising multiple robots; real-time mapping and object detection & Intuitive interfaces; reduced operator load in GNSS-denied & Indoor trials; real-time image streaming & UAV-focused; multiple aerial robots; high-end hardware \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Research shows that progress in SAR robotics remains siloed. Conceptual frameworks define high-level needs but rarely translate into embedded, cost-constrained ground platforms. While indoor path planning achieves efficiency and human-intuitive routing, it often lacks the communication resilience and perception layers essential for debris-filled environments. Similarly, human-robot collaboration studies demonstrate intuitive interfaces that reduce operator workload, but these are largely limited to UAV fleets in controlled settings using expensive hardware and stable networks.
+
+\section{AI-Based Perception}
+\label{sec:lit_ai}
+
+AI for SAR perception focuses on converting raw sensor data into actionable insights. Immersive 3D mapping uses LiDAR-SLAM and hazard sensing to create real-time VR/AR reconstructions; field tests show such systems can fly for 16 minutes at 1--5\,m/s while identifying shielded radiation sources \cite{dayani2021}. Other approaches utilise video foundation models to summarise robot footage into storyboards or text summaries \cite{video2023}; query-driven summarisation achieves high accuracy and saves operators time compared to raw video, but high GPU requirements and 9--23\,s latencies hinder real-time deployment. Similarly, LLMs can translate egocentric metadata into natural-language reports or temporal queries \cite{dechant2023}; while QA accuracy is high in familiar settings, summary accuracy drops in unseen environments. Most of these methods rely on simulations and lack stress-testing against noisy, real-world SAR data. Table~\ref{tab:ai_compare} compares existing work on AI perception in robots.
+
+\begin{table}[htbp]
+\caption{Comparison of existing work on AI perception in robots.}
+\label{tab:ai_compare}
+\centering
+\small
+\begin{tabular}{p{2.2cm}p{2cm}p{2cm}p{2.2cm}p{2.2cm}}
+\toprule
+\textbf{Domain} & \textbf{Robot/sensing} & \textbf{Algorithm} & \textbf{Key metrics} & \textbf{Gaps} \\
+\midrule
+3D mapping + hazard \cite{dayani2021} & Single aerial; LiDAR + sensors & Real-time SLAM + reconstruction & $\sim$16\,min @ 6\,kg; 1--5\,m/s; localised source & Single platform; no coordination \\
+Video summarisation \cite{video2023} & Multi-robot egocentric video & Video embeddings + temporal segmentation & Query accuracy high; storyboard saves $\sim$125\,s; latency 9--23\,s & Latency; GPU; domain shift \\
+Language action \cite{dechant2023} & Virtual agents; egocentric data & CNN+LLM for QA + summarisation & QA acc 0.99 (seen); long-summary 0.85 (seen) & Sim-to-real gap; poor generalisation \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The gap between laboratory performance and SAR operational reality is vast. Using data from the DARPA SubT Challenge, the NCTU group evaluated CNN architectures (FCN, Mask-RCNN, Yolact) on NVIDIA Jetson Xavier in smoky tunnels \cite{lu2022}. Their findings reveal a critical trade-off: Mask-RCNN provided high precision (up to 0.770 AP) but operated at only 1.0 FPS; faster models like Yolact (2.4 FPS) suffered from extreme noise sensitivity, with accuracy dropping to near zero in cluttered underground conditions \cite{lu2022}. General-purpose CNNs on budget hardware necessitate significant trade-offs. For resource-constrained SAR systems, specialised detection pipelines may be more reliable than broad deep-learning models \cite{lu2022}. While individual fields like LiDAR-IMU odometry, mesh networking, and HRI have advanced, they remain isolated; high-performance solutions often require hardware or bandwidth currently unavailable to deployable ground robots \cite{lee2024}.
+
+Field results from the SubT Challenge highlight a disconnect between theory and practice. High-accuracy LiDAR-IMU odometry demands compute power exceeding embedded limits, while lightweight ICP-based alternatives suffer from significant drift \cite{lu2022}. Communication also remains a dominant bottleneck. Furthermore, current systems often lack communication-aware navigation, where paths are planned based on real-time signal strength. Despite advances in decentralised coordination, the human-on-the-loop model remains essential. This bottleneck is mirrored in AI perception, where the compute cost of high-fidelity models restricts their real-world utility on embedded chips. While heterogeneous fleets offer conceptual advantages, coordination overhead and physical vulnerabilities often make robust, single-platform ground systems more practical in actual disaster scenarios.
+
+Lu et al.\ \cite{lu2022} provide a strong methodological foundation but expose key gaps in human-robot interaction and embedded algorithm deployment. Their system relies heavily on human supervision for goal setting and data interpretation. Our project addresses this through automated reporting that converts sensor data into natural-language summaries and actionable insights, significantly reducing cognitive load. Although Lu et al.\ employ advanced algorithms, their reliance on high-end hardware such as NVIDIA Jetson and industrial PCs overlooks power constraints. In contrast, our solution runs on a Raspberry Pi~4 and embedded microcontrollers, achieving lower energy use, extended runtimes, and cost-effective deployment. Their research, tailored for the DARPA SubT Challenge, focuses on specialised systems like blimps and mmWave radar for subterranean exploration. Our project instead targets accessible surface environments with lightweight, deployable hardware. Finally, while their relay nodes offer temporary mesh coverage, our long-duration mesh nodes (added to the routing table upon deployment) provide persistent, reusable communication infrastructure, enabling sustained operation and supporting multi-robot collaboration.

@@ -1,0 +1,156 @@
+% Full thesis: Chapters 1--6, Appendices, Bibliography.
+% Front matter: TOC, LOF, LOT, List of Acronyms, Abstract (each on own page). Abstract last. Chapter 1 starts page 1 (odd).
+
+\documentclass{thesis-report}
+
+\title{Deploying an Autonomous Indoor Robot with Laser Mapping and Multi-Hop Networking for Disaster Site Exploration}
+\author{Habeel Ali}
+\date{\today}
+
+\begin{document}
+
+% No \maketitle here; add cover pages before this file or in a separate front matter file.
+
+% --- Front matter: no page numbers on TOC, LOF, LOT, Acronyms, Abstract ---
+% TOC/LOF/LOT and \chapter* use \thispagestyle{plain}, so temporarily make plain = empty
+\makeatletter
+\let\ps@plain@saved\ps@plain
+\let\ps@plain\ps@empty
+\makeatother
+\pagenumbering{roman}
+\setcounter{page}{1}
+\pagestyle{empty}
+
+\tableofcontents
+\newpage
+
+\phantomsection
+\addtocontents{toc}{\protect\contentsline{chapter}{List of Figures}{}{section*.2}}
+\listoffigures
+\newpage
+
+\phantomsection
+\addtocontents{toc}{\protect\contentsline{chapter}{List of Tables}{}{section*.4}}
+\listoftables
+\newpage
+
+\phantomsection
+\addtocontents{toc}{\protect\contentsline{chapter}{List of Symbols, Abbreviations and Acronyms}{}{section*.6}}
+\chapter*{List of Symbols, Abbreviations and Acronyms}
+\small
+\begin{longtable}{@{}ll@{}}
+\toprule
+\textbf{Abbreviation} & \textbf{Meaning} \\
+\midrule
+\endfirsthead
+
+\multicolumn{2}{@{}l}{\textit{Continued from previous page}} \\
+\toprule
+\textbf{Abbreviation} & \textbf{Meaning} \\
+\midrule
+\endhead
+
+\midrule
+\multicolumn{2}{@{}r}{\textit{Continued on next page}} \\
+\endfoot
+
+\bottomrule
+\endlastfoot
+
+4G & Fourth-generation cellular network \\
+AI & Artificial Intelligence \\
+AP & Average Precision; Access Point \\
+BFS & Breadth-First Search \\
+BMS & Battery Management System \\
+BOM & Bill of Materials \\
+CNN & Convolutional Neural Network \\
+CPU & Central Processing Unit \\
+CSV & Comma-Separated Values \\
+DARPA & Defense Advanced Research Projects Agency \\
+DTN & Delay-Tolerant Networking \\
+DWB & Dynamic Window Approach (local planner) \\
+ESP & Espressif (microcontroller family) \\
+FastAPI & Python web framework for APIs \\
+FPS & Frames per second \\
+GCS & Ground Control Station \\
+GNSS & Global Navigation Satellite System \\
+GPU & Graphics Processing Unit \\
+HRI & Human--Robot Interaction \\
+Hz & Hertz \\
+ICP & Iterative Closest Point \\
+IMU & Inertial Measurement Unit \\
+JSON & JavaScript Object Notation \\
+JSONL & JSON Lines (format) \\
+JPEG & Joint Photographic Experts Group (image format) \\
+KPI & Key Performance Indicator \\
+LiDAR & Light Detection and Ranging \\
+LiPo & Lithium Polymer (battery) \\
+LLM & Large Language Model \\
+LoRa & Long Range (radio technology) \\
+LoS & Line of sight \\
+LTE & Long-Term Evolution (cellular) \\
+LTS & Long-Term Support \\
+mAh & Milliampere-hour \\
+MCU & Microcontroller Unit \\
+Nav2 & ROS~2 Navigation Stack \\
+PDR & Packet Delivery Ratio \\
+ProxMaP & Proximal occupancy Map Prediction \\
+RGB-D & Red-Green-Blue Depth (camera) \\
+ROS & Robot Operating System \\
+RSSI & Received Signal Strength Indicator \\
+SAR & Search and Rescue \\
+SDR & Software-Defined Radio \\
+SDG & Sustainable Development Goal \\
+SDN & Software-Defined Networking \\
+SLAM & Simultaneous Localisation and Mapping \\
+SNR & Signal-to-Noise Ratio \\
+SPI & Serial Peripheral Interface \\
+SubT & Subterranean (Challenge) \\
+TF & Transform (ROS coordinate frames) \\
+UART & Universal Asynchronous Receiver-Transmitter \\
+UGV & Unmanned Ground Vehicle \\
+U-Net & U-shaped convolutional network \\
+USB & Universal Serial Bus \\
+UWB & Ultra-Wideband \\
+V & Volt \\
+VO & Visual Odometry \\
+Wi-Fi & Wireless Fidelity \\
+X-SDM & Spatial Decision Memory (LLM-driven) \\
+YOLO & You Only Look Once (object detector) \\
+ZigBee & Low-power wireless mesh standard \\
+\end{longtable}
+\normalsize
+\newpage
+
+\phantomsection
+\addtocontents{toc}{\protect\contentsline{chapter}{Abstract}{}{section*.8}}
+\chapter*{Abstract}
+Reconnaissance and strategic planning are fundamental yet challenging requirements for crisis response missions. Human responders often put their lives at risk traversing these places and face significant cognitive load. This project presents an autonomous unmanned ground vehicle (UGV) for efficient information gathering and reporting of crisis sites. The UGV is based on a four-wheel platform, capable of mapping its surroundings, annotating them with useful information, and carrying payloads. It can establish multiple communication channels and deploy resilient mesh infrastructure that can be used by other robots. The UGV is capable of autonomously exploring sites, inferring useful information from its surroundings, and generating natural-language mission reports for operators. The final system significantly advances the technical depth of existing platforms by delivering a fully integrated robotic platform for more efficient emergency response.
+\cleardoublepage
+
+% --- Main matter: Chapter 1 starts on page 1 (odd); restore page numbers ---
+\makeatletter
+\let\ps@plain\ps@plain@saved
+\makeatother
+\pagestyle{plain}
+\pagenumbering{arabic}
+\setcounter{page}{1}
+
+% Chapters
+\input{chapters/chapter01}
+\input{chapters/chapter02}
+\input{chapters/chapter03}
+\input{chapters/chapter04}
+\input{chapters/chapter05}
+\input{chapters/chapter06}
+
+% Appendices: do not force odd-page start (no blank "Page intentionally left blank")
+\appendix
+\renewcommand{\cleardoublepage}{\newpage}
+\input{appendices}
+
+% Bibliography
+\bibliographystyle{ieeetr}
+\bibliography{references}
+
+\end{document}

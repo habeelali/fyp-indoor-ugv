@@ -1,0 +1,19 @@
+% Chapter 6: Conclusions and Future Work
+
+\chapter{Conclusions and Future Work}
+
+This chapter summarises the contributions of the thesis and outlines three directions for future work.
+
+The thesis presented an integrated unmanned ground vehicle for indoor disaster reconnaissance that combines LiDAR-based simultaneous localization and mapping, multi-tier communication (Wi-Fi, 4G, ESP-WiFi-MESH with deployable nodes, and LoRa), and AI-based perception with natural-language reporting. The system runs on a Raspberry Pi~4 (8\,GB), deploys mesh nodes along its path for resilient connectivity---with nodes added to the routing table upon deployment---and offloads AI to the operator station, achieving almost two hours of runtime at 0.2\,m/s. Controlled tests demonstrated real-time mapping with acceptable drift when loop closure is available, usable communication across all tiers with graceful degradation, and detection and summarisation suitable for reducing operator cognitive load. The platform is aimed at resource-constrained deployment where cost and power matter and fills a gap between high-end research systems and practical, single-UGV solutions for disaster response. It is designed for indoor use and is not intended for stairs or extremely coarse terrain. Code, data, and additional materials are available from the authors upon reasonable request.
+
+\section{Idea 1: 3D SLAM and Multi-Level Awareness}
+
+The current system uses 2D SLAM and a single horizontal plane for mapping and navigation. A natural extension is the integration of 3D SLAM to support multi-level awareness, for example in buildings with multiple floors or in environments where overhanging obstacles and vertical structure matter. 3D maps would allow the navigation stack to reason about height and would support future extensions such as stair detection or multi-level path planning. Integration with the existing Nav2 and frontier-based exploration workflow would require careful design so that computational and hardware costs remain within the resource-constrained target.
+
+\section{Idea 2: Multi-Robot and Swarm Coordination}
+
+The same mesh backbone and deployable node design can support multi-robot coordination. Multiple UGVs (and optionally UAVs) could share the mesh network and the same map or overlapping maps, with communication-aware planning so that relay placement and routing remain robust. Swarm coordination would require shared state (e.g.\ merged occupancy grids or semantic maps), task allocation, and possibly distributed frontier allocation to avoid redundant exploration. The long-lived mesh nodes left on site after a mission could serve as infrastructure for follow-on robots, reducing repeated deployment overhead.
+
+\section{Idea 3: Deployment in Harsher and Varied Scenarios}
+
+Future work should include stress testing in heavy smoke, dust, and low light to characterise sensor and perception limits. Deployment in multi-storey buildings and in post-flood or post-earthquake sites would require additional sensors (e.g.\ thermal imaging, gas sensors for fire and hazmat) and mechanical or software hardening. Operational procedures and training for responders would help integrate the system into real-world response workflows. Comparative studies against other SAR platforms (e.g.\ with onboard GPU or different SLAM backends) and user studies with professional responders would clarify the benefits of the operator-side AI and embedded SLAM choices and the suitability of current latency and summarisation for field use.
